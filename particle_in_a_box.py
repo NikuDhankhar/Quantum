@@ -83,24 +83,17 @@ def infinite_well(L, interior_points, state_number):
 
     # plotting the energy vs quantum number graph
     plt.figure(figsize=(10, 6))
-
     plt.plot(quantum_number,energies,label="Numerical energy")
-
-    plt.plot(
-    quantum_number,
-    analytical_energies,
-    label="Analytical energy")
-
+    plt.plot(quantum_number,analytical_energies,label="Analytical energy")
     plt.xlabel("Quantum Number (n)")
     plt.ylabel("Energy")
     plt.title("Numerical vs Analytical Energy")
     plt.legend()
     plt.grid(True)
     plt.show()
-    
+
 infinite_well(2,500,0)
 """
-    next work: add normalized and non normalized graphs
     later work on step potential.
 """
 
