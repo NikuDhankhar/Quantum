@@ -93,7 +93,5 @@ def infinite_well(L, interior_points, state_number):
     plt.show()
 
 infinite_well(2,500,0)
-"""
-    later work on step potential.
-"""
+
 
