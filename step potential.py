@@ -59,6 +59,7 @@ def solving_plotting(L, V0, x0, interior_points, state_number):
     
     plt.plot(x_full, phi_norm, label=f'Wavefunction (n={state_number+1}) ' , color='blue')
     plt.title(f' n= {state_number+1} , Energy= {energies}')
+    plt.axvline(x0,linewidth=1.0)
     plt.xlabel('Position (x)')
     plt.ylabel('Wavefunction (ψ)')
     plt.legend()
