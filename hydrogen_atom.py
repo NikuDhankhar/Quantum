@@ -1,16 +1,15 @@
 import numpy as np 
 import matplotlib.pyplot as plt
-from hamiltonian_matrix import hamiltonian_matrix
 
 #a few constants:
-hbar = 1.054571817 * 10**(-34)
-m_e = 9.11 * 10**(-31)
-epsilon = 8.85 * 10**(-12)
-e = 1.6 * 10**(-19)
+hbar = 1.054571817 * 10**(-34) #joules second
+m_e = 9.11 * 10**(-31)  # kg
+epsilon_0 = 8.85 * 10**(-12)  # C2 N-1 m-2 OR Farad/metre
+e = 1.6 * 10**(-19)     # coulombs
 A = -hbar**2/(2*m_e)
 
-import numpy as np 
-import matplotlib.pyplot as plt
+# Bohr radius
+a0 = 4 * np.pi * epsilon_0 * hbar**2 / (m_e * e**2)
 
 # Constructing Hamiltonian matrix
 def hamiltonian_matrix(n, dr, potential_values):
@@ -36,21 +35,24 @@ def hamiltonian_matrix(n, dr, potential_values):
     
     return hamiltonian
 
-def hydrogen_atom(r,l):
-    potential = -e**2/(4*np.pi*epsilon*r) - A*l*(l+1)/r**2
-    return potential
+def hydrogen_potential(r, l):
+    # Coulomb potential
+    coulomb = -e**2 / (4 * np.pi * epsilon_0 * r)
+    # Centrifugal potential
+    centrifugal = hbar**2 * l * (l + 1) / (2 * m_e * r**2)
+    return coulomb + centrifugal
 
-def solve_and_plot(r,l,interior_points, state_number,nl):
+def solve_and_plot(r_max,l,interior_points, state_number,nl):
     if interior_points <= 0:
         raise ValueError("interior_points must be positive.")
 
     if state_number < 0 or state_number >= interior_points:
         raise ValueError("Invalid state_number.")
     
-    dr = r/(interior_points+1)
-    interior_grid = np.linspace(dr, r-dr, interior_points)
-    r_full = np.linspace(0, r, interior_points+2)
-    potential = hydrogen_atom(interior_grid, l)
+    dr = r_max/(interior_points+1)
+
+    r = np.linspace(dr, r_max-dr, interior_points)
+    potential = hydrogen_potential(r, l)
     
     hamiltonian = hamiltonian_matrix(interior_points, dr, potential)
     
@@ -59,16 +61,19 @@ def solve_and_plot(r,l,interior_points, state_number,nl):
     # Plotting the normalized wavefunctions
     plt.figure(figsize=(10,6))
     for i in range(nl):
-        phi =np.concatenate(([0],wavevector[:, i],[0]))
-        if phi[np.argmax(np.abs(phi))] < 0:
-            phi = -phi
-        norm = np.sum(np.abs(phi)**2)*dr
-        phi_norm = phi / np.sqrt(norm)
-        plt.plot(r_full, phi_norm, label=f'Wavefunction (n={i+1}) ')
-    
+        u = wavevector[:, i]
+        if u[np.argmax(np.abs(u))] < 0:
+            u = -u
+        norm = np.sum(np.abs(u)**2)*dr
+        u_norm = u / np.sqrt(norm)
+        
+        #calculating R
+        R = u_norm/r
+        
+        plt.plot(r/a0, R,label=r"$R(r)$" )
     plt.title(f' n= {state_number+1} , Energy= {energies[state_number]:.2e}Joules')
-    plt.xlabel('radius (r)')
-    plt.ylabel('radial wavefunction u(r)')
+    plt.xlabel('r/a0')
+    plt.ylabel('radial wavefunction R(r)')
     plt.ticklabel_format(axis='y', style='sci', scilimits=(0,0))
     plt.legend()
     plt.grid(True)
